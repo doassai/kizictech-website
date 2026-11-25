@@ -1,0 +1,327 @@
+/* Hardware section: a tower workstation that assembles itself as the page scrolls.
+   Without the is-live class (no JavaScript, or reduced motion) this is an ordinary
+   two-column section with the finished drawing and every caption visible. */
+
+.s-hardware {
+  --s-hardware-top: 0px;
+  padding-block: calc(var(--section-gap) / 2);
+}
+
+@media (min-width: 56.0625rem) {
+  .s-hardware {
+    --s-hardware-top: var(--header-h); /* the header is sticky from this width up */
+  }
+}
+
+/* ---------- Layout (static) ---------- */
+
+.s-hardware .s-hardware__grid {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+}
+
+.s-hardware .s-hardware__copy {
+  position: relative;
+  min-width: 0;
+}
+
+.s-hardware .s-hardware__beats {
+  display: grid;
+  gap: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+.s-hardware .s-hardware__beat h2 {
+  font-size: clamp(2.25rem, 8.6vw, 3.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.s-hardware .s-hardware__beat h3 {
+  font-size: clamp(1.375rem, 3vw, 1.75rem);
+}
+
+.s-hardware .s-hardware__beat p {
+  margin-top: 0.6em;
+  max-width: 34ch;
+  color: var(--text-soft);
+  font-size: clamp(1.0625rem, 1.5vw, 1.25rem);
+  line-height: 1.5;
+}
+
+.s-hardware .s-hardware__beat h2 + p {
+  margin-top: 1.1rem;
+  max-width: 30ch;
+  color: var(--text);
+  font-size: clamp(1.125rem, 1.7vw, 1.375rem);
+}
+
+.s-hardware .s-hardware__rail {
+  display: none;
+}
+
+.s-hardware .s-hardware__figure {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  /* a soft pool of the logo photo's backdrop behind the drawing */
+  background: radial-gradient(closest-side, rgba(78, 92, 99, 0.5), rgba(78, 92, 99, 0) 100%);
+}
+
+.s-hardware .s-hardware__svg {
+  width: 100%;
+  height: auto;
+  max-height: 44rem;
+  margin-inline: auto;
+  overflow: visible;
+  color: var(--text);
+}
+
+@media (min-width: 56.0625rem), (min-width: 48rem) and (orientation: landscape), (orientation: landscape) and (max-height: 34rem) and (min-width: 36rem) {
+  .s-hardware .s-hardware__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .s-hardware .s-hardware__beat h2 {
+    font-size: clamp(2.25rem, 4.3vw, 4rem);
+  }
+}
+
+/* ---------- The drawing ---------- */
+
+.s-hardware .s-hardware__svg path {
+  stroke-width: 1.6;
+}
+
+.s-hardware .s-hardware__svg .hw-heavy {
+  stroke-width: 2.4;
+}
+
+.s-hardware .s-hardware__svg .hw-fine {
+  stroke: var(--text-soft);
+  stroke-width: 1;
+  stroke-opacity: 0.85;
+}
+
+.s-hardware .s-hardware__svg .hw-ground {
+  stroke: var(--text-soft);
+  stroke-width: 1;
+  stroke-opacity: 0.45;
+}
+
+/* Orange only where the machine is lit. */
+.s-hardware .s-hardware__svg .hw-lit {
+  filter: url(#s-hardware-bloom);
+}
+
+.s-hardware .s-hardware__svg .hw-led {
+  stroke: var(--accent);
+  stroke-width: 2.2;
+}
+
+.s-hardware .s-hardware__svg .hw-led-bar {
+  stroke: var(--accent);
+  stroke-width: 3;
+}
+
+.s-hardware .s-hardware__svg .hw-led-fill {
+  fill: var(--accent);
+  stroke: none;
+}
+
+.s-hardware .s-hardware__svg .hw-spill path,
+.s-hardware .s-hardware__svg .hw-plate path {
+  stroke: none;
+}
+
+/* Circuit-board black under the two boards, so the card sits in front of the board. */
+.s-hardware .s-hardware__svg .hw-plate-board {
+  fill: var(--surface);
+  fill-opacity: 0.5;
+}
+
+.s-hardware .s-hardware__svg .hw-plate-card {
+  fill: var(--surface);
+}
+
+.s-hardware .s-hardware__svg .hw-spill-in {
+  stop-color: var(--accent);
+  stop-opacity: 0.2;
+}
+
+.s-hardware .s-hardware__svg .hw-spill-out {
+  stop-color: var(--accent);
+  stop-opacity: 0;
+}
+
+@media (max-width: 47.99rem) {
+  /* the drawing is scaled down on phones, so thicken its lines to compensate */
+  .s-hardware .s-hardware__svg path {
+    stroke-width: 2;
+  }
+
+  .s-hardware .s-hardware__svg .hw-heavy {
+    stroke-width: 3;
+  }
+
+  .s-hardware .s-hardware__svg .hw-fine,
+  .s-hardware .s-hardware__svg .hw-ground {
+    stroke-width: 1.3;
+  }
+
+  .s-hardware .s-hardware__svg .hw-led-bar {
+    stroke-width: 3.6;
+  }
+}
+
+/* ---------- Live: pinned, scroll-driven scene ---------- */
+
+/* the pinned stage centres its own content, so the section needs no top padding;
+   a jump to #hardware then lands exactly where the stage pins */
+.s-hardware.is-live {
+  padding-top: 0;
+}
+
+.s-hardware.is-live .s-hardware__track {
+  height: 360vh;
+}
+
+.s-hardware.is-live .s-hardware__stage {
+  position: sticky;
+  top: var(--s-hardware-top);
+  height: calc(100vh - var(--s-hardware-top));
+  height: calc(100svh - var(--s-hardware-top));
+  display: grid;
+  align-items: center;
+  overflow: hidden;
+}
+
+.s-hardware.is-live .s-hardware__grid {
+  height: 100%;
+  max-height: 40rem; /* keeps drawing and caption together on tall phones */
+  padding-block: clamp(1rem, 3vh, 2rem);
+  /* phones: drawing on top, captions underneath, both always on screen */
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.s-hardware.is-live .s-hardware__figure {
+  order: -1;
+}
+
+/* The drawing rests on the bottom of its cell, just above the caption. */
+.s-hardware.is-live .s-hardware__svg {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+}
+
+.s-hardware.is-live .s-hardware__copy {
+  padding-top: 1.1rem;
+}
+
+.s-hardware.is-live .s-hardware__beats {
+  gap: 0;
+}
+
+/* Captions share one cell, so the block is as tall as the tallest and nothing jumps. */
+.s-hardware.is-live .s-hardware__beat {
+  grid-area: 1 / 1;
+  align-self: start;
+  will-change: opacity, transform;
+}
+
+.s-hardware.is-live .s-hardware__beat h2,
+.s-hardware.is-live .s-hardware__beat h3 {
+  font-size: clamp(1.75rem, 8.2vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.s-hardware.is-live .s-hardware__beat p,
+.s-hardware.is-live .s-hardware__beat h2 + p {
+  margin-top: 0.7rem;
+  max-width: 32ch;
+  color: var(--text-soft);
+  font-size: clamp(1.0625rem, 1.6vw, 1.3125rem);
+}
+
+/* Progress through the scene: a short rule that fills as the build advances. */
+.s-hardware.is-live .s-hardware__rail {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4.5rem;
+  height: 2px;
+  background: var(--line);
+}
+
+.s-hardware.is-live .s-hardware__rail span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--text);
+  transform-origin: 0 0;
+  transform: scaleX(var(--s-hardware-p, 0));
+}
+
+@media (min-width: 56.0625rem), (min-width: 48rem) and (orientation: landscape), (orientation: landscape) and (max-height: 34rem) and (min-width: 36rem) {
+  .s-hardware.is-live .s-hardware__grid {
+    max-height: none;
+    grid-template-rows: minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 4.5rem);
+  }
+
+  .s-hardware.is-live .s-hardware__figure {
+    order: 0;
+  }
+
+  .s-hardware.is-live .s-hardware__svg {
+    top: 0;
+    height: 100%;
+  }
+
+  .s-hardware.is-live .s-hardware__copy {
+    align-self: center;
+    padding-top: 0;
+    padding-left: clamp(1.25rem, 2.4vw, 2.25rem);
+  }
+
+  .s-hardware.is-live .s-hardware__beat {
+    align-self: center;
+  }
+
+  .s-hardware.is-live .s-hardware__beat h2,
+  .s-hardware.is-live .s-hardware__beat h3 {
+    font-size: clamp(1.75rem, 4vw, 3.25rem);
+  }
+
+  .s-hardware.is-live .s-hardware__rail {
+    top: 50%;
+    width: 2px;
+    height: 9rem;
+    margin-top: -4.5rem;
+  }
+
+  .s-hardware.is-live .s-hardware__rail span {
+    transform: scaleY(var(--s-hardware-p, 0));
+  }
+}
+
+/* portrait tablets use the stacked phone layout with a bigger drawing */
+@media (min-width: 48rem) and (max-width: 56rem) and (orientation: portrait) {
+  .s-hardware.is-live .s-hardware__grid {
+    max-height: 54rem;
+  }
+}
+
+@media (min-width: 56.0625rem) and (min-height: 60rem) {
+  .s-hardware.is-live .s-hardware__grid {
+    padding-block: 8vh;
+  }
+}

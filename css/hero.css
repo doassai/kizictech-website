@@ -1,0 +1,374 @@
+/* KizicTech — hero: the sign powers up.
+   One idea: the logo is a lit sign on a slate wall. It starts unlit, the LEDs come on
+   one by one, the type arrives, and as the visitor scrolls the sign powers down and
+   recedes while the headline holds.
+
+   The logo is drawn in code (inline SVG in index.html), split into stacked layers so
+   light can be switched by fading whole layers, without repainting the boards:
+     __wall          the pool of light the sign throws on the wall        (light)
+     __layer--base   shared definitions and the shadows on the wall       (always)
+     __layer--spill  orange light on the wall around the letters          (light)
+     __layer--body   the sign itself, switched off                        (always)
+     __layer--light  the lit edge of the trays and every LED              (light)
+     __bloom         a soft overall glow                                  (light)
+   Default styles are the finished, lit state. Only the classes the script adds
+   (is-live, is-intro, is-on, is-pinned) hide, animate or pin anything. */
+
+.s-hero {
+  /* when every LED is on: the stagger across all of them, plus a beat */
+  --s-hero-lit: calc(0.12s + var(--s-hero-n, 30) * 0.055s + 0.42s);
+  --s-hero-p: 0;                                         /* scroll progress, 0 to 1, set by js/hero.js */
+  --s-hero-stage-h: calc(100vh - var(--header-h));
+  --s-hero-pad: clamp(1.5rem, 4vh, 3rem);                /* stage bottom padding */
+  /* room the type block needs under the sign: two headline lines (they scale with the
+     viewport), three lede lines, the buttons, the gaps and the bottom padding */
+  --s-hero-text-h: calc(12.75rem + min(9.2vw, 15.4vh, 9.6rem) + var(--s-hero-pad));
+  --s-hero-sign-h: clamp(17rem, min(calc((var(--s-hero-stage-h) - var(--s-hero-text-h)) / 0.945), 60vw), 48rem);
+  position: relative;
+  padding-block: 0 clamp(1.5rem, 4vw, 3rem);
+}
+
+@supports (height: 100svh) {
+  .s-hero {
+    --s-hero-stage-h: calc(100svh - var(--header-h));
+  }
+}
+
+.s-hero .s-hero__stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: var(--s-hero-stage-h);
+  padding: 0 var(--gutter) var(--s-hero-pad);
+  overflow: hidden;
+}
+
+.s-hero .s-hero__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---------- The sign ---------- */
+
+.s-hero .s-hero__sign {
+  position: relative;
+  flex: none;
+  width: calc(var(--s-hero-sign-h) * 4 / 3);
+  height: var(--s-hero-sign-h);
+  aspect-ratio: 4 / 3;                                   /* the logo's 1320 x 990 drawing area */
+  margin-block: calc(var(--s-hero-sign-h) * 0.02) calc(var(--s-hero-sign-h) * -0.075);
+  transform-origin: 50% 46%;
+  transform: scale(calc(1 - var(--s-hero-p) * 0.24));
+}
+
+.s-hero .s-hero__layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;                                     /* shadows and glows may run past the drawing area */
+  pointer-events: none;
+}
+
+/* everything that is light fades out together as the visitor scrolls */
+.s-hero .s-hero__wall,
+.s-hero .s-hero__layer--spill,
+.s-hero .s-hero__layer--light,
+.s-hero .s-hero__bloom {
+  opacity: calc(1 - var(--s-hero-p));
+}
+
+/* the pool of light the sign throws on the wall: the slate lifts towards --bg-lift
+   behind the letters and fades out long past them */
+.s-hero .s-hero__wall {
+  position: absolute;
+  inset: -35% -75%;
+  background:
+    linear-gradient(to bottom, rgba(204, 211, 215, 0.13) 22%, rgba(204, 211, 215, 0) 58%),
+    linear-gradient(to bottom, rgba(78, 92, 99, 1) 50%, rgba(78, 92, 99, 0.6) 80%);
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 40%, rgba(0, 0, 0, 0.45) 68%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 40%, rgba(0, 0, 0, 0.45) 68%, transparent 100%);
+}
+
+.s-hero .s-hero__bloom {
+  position: absolute;
+  inset: 4% -10% 2%;
+  background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(255, 90, 31, 0.16) 0, rgba(255, 90, 31, 0.07) 45%, rgba(255, 90, 31, 0) 72%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* ---------- The two knobs are the sign's power buttons ---------- */
+
+.s-hero .s-hero__knob {
+  position: absolute;
+  z-index: 2;
+  width: 6.2%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.s-hero .s-hero__knob:hover {
+  background: radial-gradient(closest-side, rgba(255, 179, 71, 0.22), rgba(255, 90, 31, 0));
+}
+
+.s-hero .s-hero__knob:active {
+  background: radial-gradient(closest-side, rgba(255, 179, 71, 0.42), rgba(255, 90, 31, 0));
+}
+
+/* switched off at a knob: everything that is light goes out */
+.s-hero.is-off .s-hero__wall,
+.s-hero.is-off .s-hero__layer--spill,
+.s-hero.is-off .s-hero__bloom,
+.s-hero.is-off #logo-rim,
+.s-hero.is-off .led {
+  opacity: 0;
+  transition: opacity 0.22s ease-out;
+}
+
+/* ...except the knobs' own indicators, which idle so the way back on is visible */
+.s-hero.is-off .led.knob-led {
+  opacity: 0.45;
+}
+
+/* ---------- Type ---------- */
+
+.s-hero .s-hero__text {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  text-align: center;
+}
+
+.s-hero .s-hero__title {
+  /* 4.3vw keeps line two on one line from 56rem up; 7.2vh keeps short windows in proportion */
+  font-size: clamp(2.4rem, min(4.3vw, 7.2vh), 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.03;
+}
+
+.s-hero .s-hero__line {
+  display: block;
+}
+
+.s-hero .s-hero__lede {
+  max-width: 44rem;
+  margin: 1.25rem auto 0;
+  font-size: clamp(1.0625rem, 0.97rem + 0.4vw, 1.3rem);
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+
+.s-hero .s-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  max-width: none;
+  margin-top: 1.75rem;
+}
+
+/* ---------- Small screens: the header is static, so no pinning; the sign bleeds wide ---------- */
+
+@media (max-width: 56rem) {
+  .s-hero {
+    --s-hero-sign-h: min(87vw, 27rem);
+  }
+
+  .s-hero .s-hero__stage {
+    justify-content: flex-start;
+    min-height: 0;
+    padding-bottom: 0;
+  }
+
+  .s-hero .s-hero__sign {
+    margin-block: calc(var(--s-hero-sign-h) * 0.03) calc(var(--s-hero-sign-h) * -0.07);
+  }
+
+  .s-hero .s-hero__title {
+    font-size: clamp(1.75rem, 0.95rem + 3.4vw, 2.75rem);
+  }
+}
+
+/* phones: the two buttons stack at one width instead of wrapping ragged */
+@media (max-width: 30rem) {
+  .s-hero .s-hero__actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .s-hero .s-hero__actions .button {
+    width: 100%;
+    max-width: 20rem;
+  }
+}
+
+/* ---------- Live: power-up on load, power-down on scroll ---------- */
+
+.s-hero.is-live .s-hero__sign {
+  will-change: transform;
+}
+
+.s-hero.is-live .s-hero__wall,
+.s-hero.is-live .s-hero__layer--spill,
+.s-hero.is-live .s-hero__layer--light,
+.s-hero.is-live .s-hero__bloom {
+  will-change: opacity;
+}
+
+/* pinned scene (desktop, and only when the script has checked that everything fits) */
+@media (min-width: 56.0625rem) {
+  .s-hero.is-pinned .s-hero__track {
+    height: calc(var(--s-hero-stage-h) + 70vh);
+  }
+
+  .s-hero.is-pinned .s-hero__stage {
+    position: sticky;
+    top: var(--header-h);
+    height: var(--s-hero-stage-h);
+  }
+}
+
+/* before the power comes on */
+.s-hero.is-intro .s-hero__wall,
+.s-hero.is-intro .s-hero__layer--spill,
+.s-hero.is-intro #logo-rim,
+.s-hero.is-intro .led,
+.s-hero.is-intro .s-hero__bloom,
+.s-hero.is-intro .s-hero__rise {
+  opacity: 0;
+}
+
+/* The LEDs come on one at a time, left to right, each with a quick stutter
+   (--i is its place in the order, --s-hero-n how many there are). */
+.s-hero.is-intro.is-on .led,
+.s-hero.is-powering .led {
+  animation: s-hero-led 0.52s linear both;
+  animation-delay: calc(0.12s + var(--i, 0) * 0.055s);
+}
+
+/* once the last LED is on, the edge of the trays catches... */
+.s-hero.is-intro.is-on #logo-rim,
+.s-hero.is-powering #logo-rim {
+  animation: s-hero-rim 0.7s linear both;
+  animation-delay: var(--s-hero-lit);
+}
+
+/* ...and the light spreads onto the wall */
+.s-hero.is-intro.is-on .s-hero__layer--spill,
+.s-hero.is-intro.is-on .s-hero__wall,
+.s-hero.is-powering .s-hero__layer--spill,
+.s-hero.is-powering .s-hero__wall {
+  animation: s-hero-spill 1.1s ease-out both;
+  animation-delay: calc(var(--s-hero-lit) + 0.15s);
+}
+
+.s-hero.is-intro.is-on .s-hero__bloom,
+.s-hero.is-powering .s-hero__bloom {
+  animation: s-hero-bloom 1.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(var(--s-hero-lit) + 0.15s);
+}
+
+/* the type starts to arrive as the last LEDs come on */
+.s-hero.is-intro.is-on .s-hero__rise {
+  animation: s-hero-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(var(--s-hero-lit) - 0.35s + var(--s-hero-i, 0) * 0.15s);
+}
+
+.s-hero .s-hero__line:nth-child(2) {
+  --s-hero-i: 1;
+}
+
+.s-hero .s-hero__lede {
+  --s-hero-i: 2.4;
+}
+
+.s-hero .s-hero__actions {
+  --s-hero-i: 3.4;
+}
+
+@keyframes s-hero-led {
+  0% { opacity: 0; }
+  8% { opacity: 1; }
+  14% { opacity: 0.15; }
+  24% { opacity: 0.9; }
+  32% { opacity: 0.35; }
+  46%, 100% { opacity: 1; }
+}
+
+@keyframes s-hero-rim {
+  0% { opacity: 0; }
+  10% { opacity: 0.7; }
+  16% { opacity: 0.1; }
+  30% { opacity: 0.85; }
+  38% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+@keyframes s-hero-spill {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes s-hero-standby {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes s-hero-bloom {
+  from { opacity: 0; transform: scale(0.7); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes s-hero-rise {
+  from { opacity: 0; transform: translate3d(0, 0.75rem, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .s-hero.is-off .led.knob-led {
+    animation: s-hero-standby 2.6s ease-in-out infinite;
+  }
+}
+
+/* belt and braces: the script does not start under reduced motion, but if the
+   preference changes mid-visit nothing may stay hidden or keep moving */
+@media (prefers-reduced-motion: reduce) {
+  .s-hero.is-intro .s-hero__wall,
+  .s-hero.is-intro .s-hero__layer--spill,
+  .s-hero.is-intro #logo-rim,
+  .s-hero.is-intro .led,
+  .s-hero.is-intro .s-hero__bloom,
+  .s-hero.is-intro .s-hero__rise {
+    opacity: 1;
+    animation: none;
+  }
+
+  .s-hero.is-powering .led,
+  .s-hero.is-powering #logo-rim,
+  .s-hero.is-powering .s-hero__layer--spill,
+  .s-hero.is-powering .s-hero__wall,
+  .s-hero.is-powering .s-hero__bloom {
+    animation: none;
+  }
+
+  .s-hero.is-live .s-hero__sign {
+    transform: none;
+  }
+
+  .s-hero.is-live .s-hero__wall,
+  .s-hero.is-live .s-hero__layer--spill,
+  .s-hero.is-live .s-hero__layer--light,
+  .s-hero.is-live .s-hero__bloom {
+    opacity: 1;
+  }
+}

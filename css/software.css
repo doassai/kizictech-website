@@ -1,0 +1,283 @@
+/* KizicTech — AI / software section (.s-software).
+   The darkest band on the page. One drawn device: three board traces leave a pin
+   header under the opening statement and one peels off to each area of work.
+
+   Default styles are the finished, fully lit state. js/software.js adds .is-live
+   to the section root, and only then are things unlit so scroll can light them.
+
+   Trace geometry is authored in SVG user units (no viewBox, so percentages mean
+   "of the SVG box" and vertical runs stretch without distorting the 45° turns).
+   --sw-k scales the whole drawing up on wide screens. */
+
+.s-software {
+  --sw-k: 1;                                   /* drawing scale */
+  --sw-by: calc(46px * var(--sw-k));           /* where a branch meets its heading, from the area's top */
+  --sw-gap: calc(14px * var(--sw-k));          /* pad centre to text */
+  --sw-indent: 3.75rem;                        /* text start, from the board's left edge */
+  --sw-name: clamp(1.625rem, 4.6vw, 3.75rem);      /* area heading size */
+
+  background: var(--deep);
+  padding-block: var(--section-gap);
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+/* ---------- Opening statement ---------- */
+
+.s-software__open {
+  display: grid;
+  align-content: end;
+  gap: clamp(1.25rem, 2.6vw, 2.25rem);
+  min-height: min(24rem, 38vh);
+  padding-bottom: clamp(2.5rem, 6vw, 4rem);
+}
+
+.s-software__turn {
+  font-size: clamp(1.125rem, 2vw, 1.625rem);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--text-soft);
+}
+
+.s-software__title {
+  font-size: clamp(1.625rem, 8.6vw, 7rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+  color: var(--text);
+}
+
+.s-software__word {
+  -webkit-text-stroke: 2px transparent;
+  paint-order: stroke fill;
+  transition: color 0.5s ease, -webkit-text-stroke-color 0.5s ease;
+}
+
+/* Unlit: an outline only. The fill matches the band so the stroke's inner half is covered. */
+.s-software.is-live .s-software__word:not(.is-on) {
+  color: var(--deep);
+  -webkit-text-stroke-color: var(--line);
+}
+
+.s-software__lede {
+  max-width: 37ch;
+  font-size: clamp(1.1875rem, 2.1vw, 1.75rem);
+  line-height: 1.4;
+  color: var(--text);
+  transition: opacity 0.6s ease;
+}
+
+.s-software.is-live .s-software__lede:not(.is-on) {
+  opacity: 0.55;
+}
+
+/* ---------- The board ---------- */
+
+.s-software__board {
+  position: relative;
+}
+
+.s-software__feed {
+  position: relative;
+  height: clamp(4.5rem, 14vh, 8rem);
+}
+
+.s-software__areas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.s-software__area {
+  position: relative;
+  padding-bottom: clamp(4.5rem, 16vh, 9rem);
+}
+
+.s-software__area:last-child {
+  padding-bottom: 0;
+}
+
+.s-software__body {
+  padding-left: var(--sw-indent);
+  /* puts the middle of the heading's first line on the branch */
+  padding-top: calc(var(--sw-by) - 0.5 * var(--sw-name));
+  transition: opacity 0.6s ease;
+}
+
+.s-software.is-live .s-software__area:not(.is-on) .s-software__body {
+  opacity: 0.55;
+}
+
+.s-software__name {
+  font-size: var(--sw-name);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.s-software__text {
+  margin-top: clamp(0.9rem, 1.6vw, 1.4rem);
+  max-width: 31ch;
+  font-size: clamp(1.125rem, 1.7vw, 1.5rem);
+  line-height: 1.45;
+  color: var(--text-soft);
+}
+
+/* ---------- Traces ---------- */
+
+.s-software__trace {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc((var(--sw-indent) - var(--sw-gap)) / var(--sw-k));
+  height: calc(100% / var(--sw-k) + 1px);     /* 1px overlap so runs meet the next drawing without a seam */
+  max-width: none;
+  overflow: visible;
+  transform: scale(var(--sw-k));
+  transform-origin: 0 0;
+  fill: none;
+  /* square ends: where one drawing hands over to the next, translucent layers must not double up */
+  stroke-linecap: butt;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.s-software__trace--feed {
+  width: 32px;
+}
+
+
+/* Each layer is a group. Fallback: strokes are opaque and the group carries the
+   opacity, so overlapping ends within one drawing never add up. */
+.s-software__base {
+  stroke: var(--line);
+  stroke-width: 2;
+  opacity: 0.7;
+}
+
+.s-software__lit {
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+.s-software__glow {
+  stroke: var(--accent);
+  stroke-width: 10;
+  opacity: 0.13;
+}
+
+.s-software__glow--tight {
+  stroke-width: 5.5;
+  opacity: 0.22;
+}
+
+/* Better: the same tints mixed into the band colour and drawn opaque, so the
+   1px overlap between one drawing and the next cannot show as a seam either. */
+@supports (color: color-mix(in srgb, red 50%, blue)) {
+  .s-software__base {
+    stroke: color-mix(in srgb, var(--line) 70%, var(--deep));
+    opacity: 1;
+  }
+
+  .s-software__glow {
+    stroke: color-mix(in srgb, var(--accent) 13%, var(--deep));
+    opacity: 1;
+  }
+
+  .s-software__glow--tight {
+    stroke: color-mix(in srgb, var(--accent) 30%, var(--deep));
+  }
+
+  /* the thin lit core can take a round tip; the wide glow stays square or its
+     end would sit over the lit core of the drawing before it */
+  .s-software__lit {
+    stroke-linecap: round;
+  }
+}
+
+/* The pin header the three traces leave from. Filled, so it sits over their top ends. */
+.s-software__header {
+  fill: var(--deep);
+  stroke: var(--line);
+  stroke-width: 2;
+}
+
+/* Live: js/software.js turns each lit segment into one dash and slides it into
+   view. It sets the dash inline on the shapes in <defs>, because rules written
+   here do not reliably reach the copies that <use> draws. */
+
+.s-software__pins {
+  fill: var(--accent);
+  stroke: none;
+  transition: fill 0.3s ease;
+}
+
+.s-software.is-live .s-software__trace--feed:not(.is-on) .s-software__pins {
+  fill: var(--line);
+}
+
+.s-software__pad {
+  fill: var(--accent);
+  stroke: var(--warm);
+  stroke-width: 1.5;
+  transition: fill 0.3s ease, stroke 0.3s ease;
+}
+
+.s-software__halo {
+  fill: var(--accent);
+  stroke: none;
+  opacity: 0.22;
+  transition: opacity 0.5s ease;
+}
+
+.s-software.is-live .s-software__area:not(.is-on) .s-software__pad {
+  fill: var(--deep);
+  stroke: var(--line);
+}
+
+.s-software.is-live .s-software__area:not(.is-on) .s-software__halo {
+  opacity: 0;
+}
+
+/* ---------- Wide screens: the areas step across the board ---------- */
+
+@media (min-width: 56rem) {
+  .s-software {
+    --sw-k: 1.5;
+  }
+
+  .s-software__open {
+    min-height: min(44rem, 70vh);
+  }
+
+  .s-software__area {
+    min-height: min(30rem, 54vh);
+  }
+
+  .s-software__area:last-child {
+    min-height: 0;
+  }
+
+  .s-software__area--apps {
+    --sw-indent: 6.5rem;
+  }
+
+  .s-software__area--products {
+    --sw-indent: 26%;
+  }
+
+  .s-software__area--research {
+    --sw-indent: 44%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .s-software__word,
+  .s-software__lede,
+  .s-software__body,
+  .s-software__pins,
+  .s-software__pad,
+  .s-software__halo {
+    transition: none;
+  }
+}

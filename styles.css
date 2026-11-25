@@ -1,0 +1,360 @@
+/* KizicTech — shared base styles (every page loads this).
+   Palette comes from the logo: blue-slate backdrop, circuit-board black, LED orange.
+   Type: Archivo (variable width). Expanded cuts for headings, normal width for text.
+   Section-specific styles live in css/<section>.css. */
+
+:root {
+  --bg: #39444a;            /* page: the logo's slate backdrop, a shade deeper */
+  --bg-lift: #4e5c63;       /* the logo photo's own backdrop colour */
+  --surface: #252c30;       /* raised panels */
+  --deep: #181d20;          /* circuit-board black: dark bands, text on orange */
+  --line: #56646c;          /* borders and rules */
+  --text: #f4f1ee;
+  --text-soft: #ccd3d7;
+  --accent: #ff5a1f;        /* LED orange */
+  --accent-hover: #ff7d4d;
+  --accent-glow: rgba(255, 90, 31, 0.35);
+  --warm: #ffb347;          /* amber highlight, use sparingly */
+
+  --radius: 4px;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+  --max: 76rem;
+  --section-gap: clamp(4.5rem, 10vw, 8.5rem);
+  --header-h: 4.25rem;
+  --sticky-h: var(--header-h); /* height the sticky header covers; 0 where it is not sticky */
+  color-scheme: dark;
+}
+
+@media (max-width: 56rem) {
+  :root {
+    --sticky-h: 0px;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  font-stretch: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--warm);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-stretch: 125%;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+  max-width: 62ch;
+  text-wrap: pretty;
+}
+
+[id] {
+  scroll-margin-top: calc(var(--sticky-h) + 1.5rem);
+}
+
+/* full-width bands carry their own top padding, so they land flush under the header */
+main > section[id] {
+  scroll-margin-top: var(--sticky-h);
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.skip {
+  position: absolute;
+  left: var(--gutter);
+  top: -4rem;
+  background: var(--text);
+  color: var(--deep);
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius);
+  z-index: 100;
+}
+
+.skip:focus {
+  top: 0.75rem;
+}
+
+/* ---------- Header ---------- */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding-block: 0.9rem;
+  background: rgba(57, 68, 74, 0.78);
+  -webkit-backdrop-filter: saturate(160%) blur(16px);
+  backdrop-filter: saturate(160%) blur(16px);
+  border-bottom: 1px solid rgba(86, 100, 108, 0.5);
+}
+
+.site-header .wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 2rem;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-stretch: 125%;
+  font-weight: 700;
+  font-size: 1.125rem;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.brand svg {
+  width: 1.9rem;
+  height: 1.9rem;
+  filter: drop-shadow(0 0 5px rgba(255, 90, 31, 0.55));
+}
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.75rem;
+  font-weight: 500;
+  font-size: 0.975rem;
+}
+
+.site-nav a {
+  text-decoration: none;
+  padding-block: 0.35rem;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.15s;
+}
+
+.site-nav a:hover,
+.site-nav a[aria-current="page"] {
+  border-bottom-color: var(--accent);
+}
+
+@media (max-width: 56rem) {
+  .site-header {
+    position: static;
+    padding-bottom: 0.25rem;
+  }
+
+  /* one row that scrolls sideways, fading out at the right edge */
+  .site-nav {
+    flex-wrap: nowrap;
+    gap: 0 0.6rem;
+    width: calc(100% + 2 * var(--gutter));
+    margin-inline: calc(-1 * var(--gutter));
+    padding-inline: calc(var(--gutter) - 0.35rem) 2.5rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 3rem), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 3rem), transparent);
+  }
+
+  .site-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .site-nav a {
+    padding: 0.7rem 0.35rem;
+  }
+}
+
+/* ---------- Buttons ---------- */
+
+.button {
+  display: inline-block;
+  padding: 0.85rem 1.4rem;
+  border-radius: var(--radius);
+  border: 2px solid var(--text);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.button-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--deep);
+  box-shadow: 0 0 28px var(--accent-glow);
+}
+
+.button-primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.button-quiet:hover {
+  background: var(--text);
+  color: var(--deep);
+}
+
+/* ---------- Footer ---------- */
+
+.site-footer {
+  padding-block: 2.5rem;
+  border-top: 1px solid var(--line);
+  color: var(--text-soft);
+  font-size: 0.95rem;
+}
+
+.site-footer .wrap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+}
+
+.site-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+}
+
+.site-footer a {
+  display: inline-block;
+  padding-block: 0.5rem;
+}
+
+.site-footer a:hover {
+  color: var(--text);
+}
+
+.site-footer a[aria-current="page"] {
+  color: var(--text);
+  text-decoration-color: var(--accent);
+}
+
+.site-footer .site-footer__legal {
+  flex-basis: 100%;
+  max-width: none;
+  font-size: 0.8125rem;
+  color: var(--text-soft);
+  opacity: 0.85;
+}
+
+/* ---------- Document pages (privacy, terms, support) ---------- */
+
+.doc {
+  padding-block: clamp(2rem, 6vw, 4.5rem) var(--section-gap);
+}
+
+.doc-inner {
+  max-width: 44rem;
+}
+
+.doc h1 {
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.doc .updated {
+  margin-top: 1rem;
+  color: var(--text-soft);
+}
+
+.doc h2 {
+  font-size: 1.5rem;
+  margin-top: 3rem;
+}
+
+.doc h3 {
+  font-size: 1.125rem;
+  margin-top: 2rem;
+}
+
+.doc p,
+.doc ul {
+  margin-top: 1rem;
+  max-width: 68ch;
+}
+
+.doc ul {
+  padding-left: 1.25rem;
+}
+
+.doc li + li {
+  margin-top: 0.4rem;
+}
+
+.doc a {
+  color: var(--text);
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+.doc a:hover {
+  color: var(--warm);
+}
+
+.doc a.button {
+  text-decoration: none;
+}
+
+.doc a.button-primary,
+.doc a.button-primary:hover {
+  color: var(--deep);
+}
+
+.doc .doc-action {
+  margin-top: 2rem;
+}
+
+.doc .lede {
+  margin-top: 1.5rem;
+  font-size: 1.25rem;
+  line-height: 1.5;
+}

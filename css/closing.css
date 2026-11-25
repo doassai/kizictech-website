@@ -1,0 +1,687 @@
+/* KizicTech — closing bundle: approach, in development (lab), contact.
+   Every selector starts with .s-approach, .s-lab or .s-contact.
+   Motion only applies once js/closing.js adds .is-live to a section root;
+   without it (no JS, or reduced motion) everything is visible and static. */
+
+/* =====================================================================
+   Approach — three principles set large, each on its own trace
+   ===================================================================== */
+
+.s-approach {
+  padding-block: var(--section-gap);
+}
+
+.s-approach .s-approach__lead {
+  max-width: 24ch;
+  font-size: clamp(1.55rem, 3vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.16;
+  letter-spacing: -0.015em;
+  color: var(--text-soft);
+}
+
+.s-approach .s-approach__list {
+  margin-top: clamp(3rem, 7vw, 5.5rem);
+}
+
+.s-approach .s-approach__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  padding-block: clamp(2.25rem, 4.6vw, 3.75rem) clamp(3rem, 6.4vw, 5.25rem);
+}
+
+.s-approach .s-approach__item:last-child {
+  padding-bottom: 0;
+}
+
+/* The rule above each principle is a board trace with an LED at its start. */
+.s-approach .s-approach__trace {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--line);
+  transform-origin: 0 50%;
+}
+
+.s-approach .s-approach__led {
+  position: absolute;
+  top: -0.25rem;
+  left: 0;
+  width: 1.5rem;
+  height: 0.5rem;
+  border-radius: 2px;
+  background: var(--line);
+}
+
+.s-approach .s-approach__led::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--accent);
+  box-shadow: 0 0 4px var(--accent), 0 0 22px 2px var(--accent-glow);
+}
+
+.s-approach .s-approach__item h3 {
+  grid-column: 1 / -1;
+  font-size: clamp(2.5rem, 7.4vw, 6rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 0.96;
+  text-wrap: balance;
+}
+
+.s-approach .s-approach__item p {
+  grid-column: 7 / -1;
+  margin-top: clamp(1.25rem, 2.6vw, 2.25rem);
+  max-width: 34rem;
+  font-size: clamp(1.0625rem, 1.55vw, 1.3rem);
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+
+@media (max-width: 56rem) {
+  .s-approach .s-approach__item p {
+    grid-column: 3 / -1;
+  }
+}
+
+@media (max-width: 40rem) {
+  .s-approach .s-approach__item p {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Reveal: the trace draws, the LED lights, the words come up to full strength. */
+.s-approach.is-live .s-approach__trace {
+  transform: scaleX(0);
+  transition: transform 1.3s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+
+.s-approach.is-live .s-approach__led::after {
+  opacity: 0;
+  transition: opacity 0.5s ease 0.1s;
+}
+
+.s-approach.is-live .s-approach__item h3 {
+  opacity: 0.5;
+  transition: opacity 0.9s ease 0.15s;
+}
+
+.s-approach.is-live .s-approach__item p {
+  opacity: 0;
+  transition: opacity 0.9s ease 0.4s;
+}
+
+.s-approach.is-live .s-approach__item.is-on .s-approach__trace {
+  transform: scaleX(1);
+}
+
+.s-approach.is-live .s-approach__item.is-on .s-approach__led::after,
+.s-approach.is-live .s-approach__item.is-on h3,
+.s-approach.is-live .s-approach__item.is-on p {
+  opacity: 1;
+}
+
+/* =====================================================================
+   Lab — a sealed unit on the bench, running, cover on
+   ===================================================================== */
+
+.s-lab {
+  --s-lab-pad: var(--section-gap);
+  --s-lab-g: 0.8; /* how much light is leaking, 0 to 1; the script ties it to scroll */
+  padding-block: var(--s-lab-pad);
+  background: var(--deep);
+  overflow: hidden;
+}
+
+.s-lab .s-lab__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.s-lab .s-lab__head {
+  grid-area: 1 / 1;
+}
+
+.s-lab .s-lab__head h2 {
+  font-size: clamp(3.25rem, 8.6vw, 7rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+}
+
+.s-lab .s-lab__status {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+}
+
+.s-lab .s-lab__led {
+  flex: none;
+  width: 1.5rem;
+  height: 0.5rem;
+  border-radius: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 4px var(--accent), 0 0 20px 3px var(--accent-glow);
+}
+
+.s-lab .s-lab__figure {
+  grid-area: 2 / 1;
+  position: relative;
+  margin-top: clamp(1.5rem, 5vw, 3rem);
+}
+
+.s-lab .s-lab__scene {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.s-lab .s-lab__body {
+  grid-area: 3 / 1;
+  padding-top: clamp(2rem, 5vw, 3rem);
+  padding-right: 1.5rem; /* keeps the text clear of the cable */
+}
+
+.s-lab .s-lab__body p {
+  color: var(--text-soft);
+}
+
+.s-lab .s-lab__body p + p {
+  margin-top: 1.1rem;
+}
+
+.s-lab .s-lab__body .s-lab__lede {
+  max-width: 30ch;
+  font-size: clamp(1.3rem, 2.1vw, 1.7rem);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.s-lab .s-lab__body p:not(.s-lab__lede) {
+  max-width: 46ch;
+}
+
+.s-lab .s-lab__body a {
+  color: var(--text);
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+.s-lab .s-lab__body a:hover {
+  color: var(--warm);
+}
+
+/* The cable leaves the drawing at its bottom right corner; this carries it
+   down the right edge of the column and out of the section. */
+.s-lab .s-lab__tail {
+  grid-area: 3 / 1;
+  justify-self: end;
+  width: 3px;
+  margin-right: -1.5px;
+  margin-bottom: calc(-1 * var(--s-lab-pad));
+  position: relative;
+  background: var(--accent);
+}
+
+/* A cable clip where the drawn cable hands over to this one. */
+.s-lab .s-lab__tail::before {
+  content: "";
+  position: absolute;
+  top: -0.4rem;
+  left: 50%;
+  width: 0.7rem;
+  height: 0.9rem;
+  transform: translateX(-50%);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--surface);
+}
+
+@media (min-width: 56rem) {
+  .s-lab .s-lab__grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-rows: auto 1fr auto;
+    column-gap: clamp(2rem, 5vw, 4.5rem);
+  }
+
+  .s-lab .s-lab__head {
+    grid-area: 1 / 1;
+  }
+
+  .s-lab .s-lab__body {
+    grid-area: 2 / 1;
+    align-self: end;
+    padding-right: 0;
+  }
+
+  .s-lab .s-lab__figure {
+    grid-area: 1 / 2 / 3 / 3;
+    align-self: end;
+    margin-top: 0;
+  }
+
+  .s-lab .s-lab__tail {
+    grid-area: 3 / 2;
+  }
+}
+
+/* --- the drawing --- */
+
+.s-lab .s-lab__bench {
+  fill: var(--surface);
+}
+
+.s-lab .s-lab__bench-edge {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.s-lab .s-lab__foot,
+.s-lab .s-lab__hinge,
+.s-lab .s-lab__port {
+  fill: var(--deep);
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.s-lab .s-lab__case {
+  fill: var(--surface);
+  stroke: var(--line);
+  stroke-width: 1.25;
+}
+
+.s-lab .s-lab__sheen {
+  pointer-events: none;
+}
+
+.s-lab .s-lab__gapline {
+  fill: none;
+  stroke: var(--warm);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  opacity: calc(0.35 + 0.65 * var(--s-lab-g));
+}
+
+.s-lab .s-lab__holes rect {
+  fill: var(--deep);
+}
+
+.s-lab .s-lab__lit rect {
+  fill: var(--accent);
+}
+
+.s-lab .s-lab__seam {
+  fill: none;
+  stroke: var(--warm);
+  stroke-width: 1.25;
+  opacity: calc(0.4 + 0.6 * var(--s-lab-g));
+}
+
+.s-lab .s-lab__handle {
+  fill: var(--deep);
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.s-lab .s-lab__screws circle {
+  fill: var(--deep);
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.s-lab .s-lab__unit-led {
+  fill: var(--accent);
+}
+
+.s-lab .s-lab__cable {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3px;
+  stroke-linecap: butt;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Light, drawn as plain gradient boxes so only their opacity ever changes. */
+.s-lab .s-lab__halo,
+.s-lab .s-lab__seamglow,
+.s-lab .s-lab__leak {
+  position: absolute;
+  pointer-events: none;
+}
+
+.s-lab .s-lab__halo {
+  z-index: 0;
+  left: 41.2%;
+  top: 38.2%;
+  width: 133%;
+  height: 163%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side,
+    rgba(255, 90, 31, 0.3) 0%,
+    rgba(255, 90, 31, 0.12) 42%,
+    transparent 100%);
+  opacity: calc(0.3 + 0.7 * var(--s-lab-g));
+}
+
+.s-lab .s-lab__seamglow {
+  z-index: 2;
+  left: 52.31%;
+  top: 5.8%;
+  width: 9.7%;
+  height: 64.9%;
+  transform: translateX(-50%) scaleX(calc(0.45 + 1.1 * var(--s-lab-g)));
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 90, 31, 0.22) 30%,
+    rgba(255, 179, 71, 0.8) 50%,
+    rgba(255, 90, 31, 0.22) 70%,
+    transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 88%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 88%, transparent 100%);
+  opacity: calc(0.2 + 0.8 * var(--s-lab-g));
+}
+
+.s-lab .s-lab__leak {
+  z-index: 2;
+  left: 13.85%;
+  top: 70.3%;
+  width: 54.9%;
+  height: 14.8%;
+  background: radial-gradient(50% 100% at 50% 0%,
+    rgba(255, 179, 71, 0.7) 0%,
+    rgba(255, 90, 31, 0.4) 32%,
+    transparent 100%);
+  opacity: calc(0.25 + 0.75 * var(--s-lab-g));
+}
+
+/* --- motion: a slow pulse on the status light, small activity behind the vents --- */
+
+@keyframes s-lab-pulse {
+  0%, 100% { opacity: 0.38; }
+  50% { opacity: 1; }
+}
+
+@keyframes s-lab-blink-a {
+  0%, 100% { opacity: 0.2; }
+  14% { opacity: 0.95; }
+  21% { opacity: 0.35; }
+  58% { opacity: 0.85; }
+  66% { opacity: 0.15; }
+}
+
+@keyframes s-lab-blink-b {
+  0%, 100% { opacity: 0.85; }
+  30% { opacity: 0.2; }
+  36% { opacity: 0.7; }
+  72% { opacity: 0.12; }
+}
+
+@keyframes s-lab-blink-c {
+  0%, 44%, 100% { opacity: 0.15; }
+  50%, 82% { opacity: 0.9; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .s-lab .s-lab__led,
+  .s-lab .s-lab__unit-led,
+  .s-lab .s-lab__unit-halo {
+    animation: s-lab-pulse 3.6s ease-in-out infinite;
+  }
+
+  .s-lab .s-lab__blink--a {
+    animation: s-lab-blink-a 5.3s ease-in-out infinite;
+  }
+
+  .s-lab .s-lab__blink--b {
+    animation: s-lab-blink-b 7.1s ease-in-out infinite;
+  }
+
+  .s-lab .s-lab__blink--c {
+    animation: s-lab-blink-c 9.7s steps(1, end) infinite;
+  }
+
+  /* Off screen, everything rests. */
+  .s-lab.is-live:not(.is-awake) .s-lab__led,
+  .s-lab.is-live:not(.is-awake) .s-lab__unit-led,
+  .s-lab.is-live:not(.is-awake) .s-lab__unit-halo,
+  .s-lab.is-live:not(.is-awake) .s-lab__blink {
+    animation-play-state: paused;
+  }
+}
+
+.s-lab.is-live .s-lab__halo,
+.s-lab.is-live .s-lab__seamglow,
+.s-lab.is-live .s-lab__leak {
+  will-change: opacity;
+}
+
+/* =====================================================================
+   Contact — the cable from the bench runs down to one address
+   ===================================================================== */
+
+.s-contact {
+  --s-contact-pad: var(--section-gap);
+  --s-contact-r: clamp(1.25rem, 3vw, 2.25rem); /* bend radius */
+  --s-contact-plug: 2.5rem;
+  --s-contact-v: 1; /* how much of each cable run is drawn, 0 to 1 */
+  --s-contact-c: 1;
+  --s-contact-h: 1;
+  padding-block: var(--s-contact-pad) calc(var(--section-gap) * 0.62);
+}
+
+.s-contact .s-contact__top {
+  position: relative;
+  container-type: inline-size;
+  padding-right: clamp(1.5rem, 4vw, 3rem); /* keeps the text clear of the cable */
+  padding-bottom: clamp(1.4rem, 3vw, 2.4rem);
+}
+
+.s-contact .s-contact__top h2 {
+  position: relative;
+  font-size: clamp(1.55rem, 3vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.16;
+  letter-spacing: -0.015em;
+}
+
+.s-contact .s-contact__lede {
+  position: relative;
+  margin-top: 0.9rem;
+  max-width: 40ch;
+  font-size: clamp(1.0625rem, 1.55vw, 1.3rem);
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+
+.s-contact .s-contact__mail {
+  position: relative;
+  max-width: none;
+  margin-top: clamp(2.5rem, 7vw, 5.5rem);
+  font-stretch: 125%;
+  font-weight: 800;
+  font-size: clamp(3rem, 15vw, 4.5rem);
+  font-size: clamp(3rem, 16cqi, 4.5rem);
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+}
+
+.s-contact .s-contact__mail a {
+  display: inline-block;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+@container (min-width: 46rem) {
+  .s-contact .s-contact__mail {
+    font-size: clamp(2.5rem, 6vw, 7rem);
+    font-size: clamp(2.5rem, 7.1cqi, 7rem);
+    white-space: nowrap;
+  }
+}
+
+.s-contact .s-contact__mail a:hover {
+  color: var(--accent-hover);
+}
+
+/* --- the cable: down the right edge, round the bend, back under the address --- */
+
+.s-contact .s-contact__cable {
+  position: absolute;
+  inset: calc(-1 * var(--s-contact-pad)) 0 0 0;
+  pointer-events: none;
+}
+
+.s-contact .s-contact__down,
+.s-contact .s-contact__along {
+  position: absolute;
+  background: var(--accent);
+}
+
+.s-contact .s-contact__down {
+  top: 0;
+  right: -1.5px;
+  bottom: calc(var(--s-contact-r) - 1.5px);
+  width: 3px;
+  transform-origin: 50% 0;
+  transform: scaleY(var(--s-contact-v));
+}
+
+/* A quarter of a ring, swept round by a conic mask as the cable draws. */
+.s-contact .s-contact__bend {
+  position: absolute;
+  right: -1.5px;
+  bottom: -1.5px;
+  width: var(--s-contact-r);
+  height: var(--s-contact-r);
+  overflow: hidden;
+  opacity: calc(var(--s-contact-c) * 1000);
+  -webkit-mask-image: conic-gradient(from 90deg at 0 0, #000 calc(var(--s-contact-c) * 90deg), transparent calc(var(--s-contact-c) * 90deg));
+  mask-image: conic-gradient(from 90deg at 0 0, #000 calc(var(--s-contact-c) * 90deg), transparent calc(var(--s-contact-c) * 90deg));
+}
+
+.s-contact .s-contact__bend::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: calc(var(--s-contact-r) * 2);
+  height: calc(var(--s-contact-r) * 2);
+  border: 3px solid var(--accent);
+  border-radius: 50%;
+}
+
+.s-contact .s-contact__along {
+  left: calc(var(--s-contact-plug) - 2px);
+  right: calc(var(--s-contact-r) - 1.5px);
+  bottom: -1.5px;
+  height: 3px;
+  transform-origin: 100% 50%;
+  transform: scaleX(var(--s-contact-h));
+}
+
+/* The plug on the end, as on the logo: ribbed orange grip, bare metal tip. */
+.s-contact .s-contact__plug {
+  position: absolute;
+  left: 0.7rem;
+  bottom: -0.4rem;
+  width: calc(var(--s-contact-plug) - 0.7rem);
+  height: 0.8rem;
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(90deg,
+      transparent 0 0.22rem,
+      rgba(24, 29, 32, 0.45) 0.22rem 0.32rem) 0.3rem 0 / 0.9rem 100% no-repeat,
+    var(--accent);
+  transition: transform 0.25s ease, opacity 0.3s ease;
+}
+
+.s-contact .s-contact__plug::before {
+  content: "";
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  width: 0.7rem;
+  height: 0.42rem;
+  transform: translateY(-50%);
+  border-radius: 1px 0 0 1px;
+  background: var(--text-soft);
+}
+
+.s-contact .s-contact__glow {
+  --s-contact-glow-h: clamp(12rem, 28vw, 22rem);
+  position: absolute;
+  left: 0;
+  right: 18%;
+  bottom: calc(var(--s-contact-glow-h) / -2);
+  height: var(--s-contact-glow-h);
+  pointer-events: none;
+  background: radial-gradient(closest-side,
+    rgba(255, 90, 31, 0.24) 0%,
+    rgba(255, 90, 31, 0.08) 50%,
+    transparent 100%);
+  transition: opacity 0.6s ease;
+}
+
+.s-contact .s-contact__top:has(.s-contact__mail a:hover) .s-contact__plug,
+.s-contact .s-contact__top:has(.s-contact__mail a:focus-visible) .s-contact__plug {
+  transform: translateX(-0.3rem);
+}
+
+.s-contact.is-live .s-contact__plug {
+  opacity: 0;
+}
+
+.s-contact.is-live .s-contact__glow {
+  opacity: 0;
+}
+
+.s-contact.is-live.is-connected .s-contact__plug {
+  opacity: 1;
+}
+
+.s-contact.is-live.is-connected .s-contact__glow {
+  opacity: 1;
+}
+
+.s-contact.is-live .s-contact__down,
+.s-contact.is-live .s-contact__along {
+  will-change: transform;
+}
+
+/* --- the lines under the cable --- */
+
+.s-contact .s-contact__foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 2.5rem;
+  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+  color: var(--text-soft);
+}
+
+.s-contact .s-contact__foot a {
+  color: var(--text);
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+.s-contact .s-contact__foot a:hover {
+  color: var(--warm);
+}

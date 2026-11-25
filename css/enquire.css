@@ -1,0 +1,293 @@
+/* KizicTech — enquiry page: a short introduction beside the form.
+   The form sits on a raised panel; fields are recessed (--deep) so they read as
+   places to type. A small LED beside the button shows what the form is doing:
+   off (idle), pulsing (sending), steady (sent). */
+
+.s-enquire {
+  padding-block: clamp(2rem, 6vw, 4.5rem) var(--section-gap);
+}
+
+.s-enquire .s-enquire__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 3rem);
+  align-items: start;
+}
+
+/* phones read top to bottom: heading, form, then the notes on what to ask about.
+   wide screens put the notes under the heading, beside the form */
+@media (min-width: 56.0625rem) {
+  .s-enquire .s-enquire__grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-rows: auto 1fr;
+    column-gap: clamp(3rem, 6vw, 5.5rem);
+    row-gap: 0;
+  }
+
+  .s-enquire .s-enquire__intro {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .s-enquire .s-enquire__grid .s-enquire__topics {
+    grid-column: 1;
+    grid-row: 2;
+    margin-top: clamp(2rem, 4vw, 3rem);
+  }
+
+  .s-enquire .s-enquire__panel {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+
+/* ---------- Introduction ---------- */
+
+.s-enquire h1 {
+  font-size: clamp(2.75rem, 7vw, 5.5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+}
+
+.s-enquire .s-enquire__lede {
+  margin-top: 1.5rem;
+  max-width: 28ch;
+  font-size: clamp(1.1875rem, 1.9vw, 1.5rem);
+  line-height: 1.4;
+}
+
+.s-enquire .s-enquire__topics {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 26rem;
+}
+
+.s-enquire .s-enquire__topics li {
+  padding-block: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.s-enquire .s-enquire__topics strong {
+  display: block;
+  font-weight: 600;
+}
+
+.s-enquire .s-enquire__topics span {
+  display: block;
+  color: var(--text-soft);
+  font-size: 0.975rem;
+}
+
+.s-enquire .s-enquire__topics a,
+.s-enquire .s-enquire__privacy a,
+.s-enquire .s-enquire__failed a,
+.s-enquire .s-enquire__sent a {
+  color: var(--text);
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+.s-enquire .s-enquire__topics a:hover,
+.s-enquire .s-enquire__privacy a:hover,
+.s-enquire .s-enquire__failed a:hover,
+.s-enquire .s-enquire__sent a:hover {
+  color: var(--warm);
+}
+
+/* ---------- Panel and fields ---------- */
+
+.s-enquire .s-enquire__panel {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.s-enquire .s-enquire__field + .s-enquire__field {
+  margin-top: 1.5rem;
+}
+
+.s-enquire label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.s-enquire .s-enquire__optional {
+  font-weight: 400;
+  color: var(--text-soft);
+}
+
+.s-enquire input[type="text"],
+.s-enquire input[type="email"],
+.s-enquire select,
+.s-enquire textarea {
+  display: block;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background-color: var(--deep);
+  color: var(--text);
+  font: inherit;
+  font-size: 1rem;                    /* 16px keeps iOS from zooming the page on focus */
+  line-height: 1.4;
+  transition: border-color 0.15s;
+}
+
+.s-enquire textarea {
+  min-height: 9.5rem;
+  resize: vertical;
+}
+
+.s-enquire select {
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 2.75rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%23ccd3d7' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 0.75rem auto;
+  cursor: pointer;
+}
+
+.s-enquire input:hover,
+.s-enquire select:hover,
+.s-enquire textarea:hover {
+  border-color: var(--text-soft);
+}
+
+.s-enquire input:focus-visible,
+.s-enquire select:focus-visible,
+.s-enquire textarea:focus-visible {
+  outline: 3px solid var(--warm);
+  outline-offset: 1px;
+  border-color: var(--warm);
+}
+
+.s-enquire [aria-invalid="true"] {
+  border-color: var(--accent);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.s-enquire .s-enquire__hint,
+.s-enquire .s-enquire__error {
+  margin-top: 0.45rem;
+  max-width: none;
+  font-size: 0.925rem;
+  line-height: 1.4;
+}
+
+.s-enquire .s-enquire__hint {
+  color: var(--text-soft);
+}
+
+.s-enquire .s-enquire__error {
+  color: var(--warm);
+  font-weight: 500;
+}
+
+.s-enquire .s-enquire__privacy {
+  margin-top: 1.75rem;
+  max-width: none;
+  color: var(--text-soft);
+  font-size: 0.95rem;
+}
+
+/* ---------- Send, and what the form is doing ---------- */
+
+.s-enquire .s-enquire__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.s-enquire .s-enquire__send {
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.s-enquire .s-enquire__send[aria-disabled="true"] {
+  cursor: progress;
+  opacity: 0.75;
+  box-shadow: none;
+}
+
+.s-enquire .s-enquire__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  min-height: 1.5rem;
+  color: var(--text-soft);
+  font-size: 0.95rem;
+}
+
+.s-enquire .s-enquire__led {
+  flex: none;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: var(--line);
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.s-enquire .is-sending .s-enquire__led,
+.s-enquire .s-enquire__led--on {
+  background: var(--accent);
+  box-shadow: 0 0 10px 2px rgba(255, 90, 31, 0.7);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .s-enquire .is-sending .s-enquire__led {
+    animation: s-enquire-pulse 0.9s ease-in-out infinite;
+  }
+}
+
+@keyframes s-enquire-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.s-enquire .s-enquire__failed {
+  margin-top: 1.5rem;
+  padding: 1rem 1.15rem;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: var(--deep);
+}
+
+.s-enquire .s-enquire__failed p {
+  max-width: none;
+}
+
+.s-enquire .s-enquire__failed p + p {
+  margin-top: 0.5rem;
+  color: var(--text-soft);
+}
+
+/* ---------- Sent ---------- */
+
+.s-enquire .s-enquire__sent:focus {
+  outline: none;
+}
+
+.s-enquire .s-enquire__sent h2 {
+  margin-top: 1.25rem;
+  font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+}
+
+.s-enquire .s-enquire__sent p {
+  margin-top: 1rem;
+  font-size: 1.125rem;
+}
+
+.s-enquire .s-enquire__sent-email {
+  overflow-wrap: anywhere;
+}
