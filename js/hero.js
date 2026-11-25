@@ -1,7 +1,8 @@
 /* KizicTech — hero.
    1. Power-up on load: the sign starts unlit, flickers on, then the type arrives (CSS
       animations; this script only sets the classes at the right moments).
-   2. Power-down on scroll: writes scroll progress (0 to 1) to --s-hero-p on the sign;
+   2. Power-down on scroll: writes scroll progress (0 to 1) to --s-hero-p on the sign
+      and on each light element;
       CSS turns that into the sign receding and its light fading.
    Does nothing under prefers-reduced-motion, so the static lit hero stays as authored. */
 (function () {
@@ -20,6 +21,10 @@
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   var knobs = root.querySelectorAll('.s-hero__knob');
+  // the elements whose brightness follows the scroll; each gets --s-hero-p directly
+  var lights = root.querySelectorAll('.s-hero__wall, .s-hero__layer--spill, .s-hero__layer--light, .s-hero__bloom');
+  var startY = 0;      // where the scroll fade begins (set by measure)
+  var current = -1;    // scroll progress, 0 to 1 (set by update)
   var powerTimer;
 
   function setPower(on) {
@@ -41,7 +46,15 @@
   }
 
   for (var k = 0; k < knobs.length; k++) {
+    knobs[k].hidden = false;   // hidden in the markup: without this script they would do nothing
     knobs[k].addEventListener('click', function () {
+      // once scrolling has dimmed the sign a toggle would be invisible: a press brings
+      // the visitor back to the lit sign instead
+      if (current > 0.5) {
+        window.scrollTo({ top: startY, behavior: reduced.matches ? 'auto' : 'smooth' });
+        if (root.classList.contains('is-off')) setPower(true);
+        return;
+      }
       setPower(root.classList.contains('is-off'));
     });
   }
@@ -121,9 +134,7 @@
   /* ---------- 2. Power-down on scroll ---------- */
 
   var wide = window.matchMedia('(min-width: 56.0625rem)');
-  var startY = 0;
   var range = 1;
-  var current = -1;
   var queued = false;
 
   function measure() {
@@ -161,6 +172,7 @@
     if (p === current) return;
     current = p;
     sign.style.setProperty('--s-hero-p', p);
+    for (var i = 0; i < lights.length; i++) lights[i].style.setProperty('--s-hero-p', p);
   }
 
   function onScroll() {

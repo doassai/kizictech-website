@@ -10,9 +10,18 @@
      __layer--spill  orange light on the wall around the letters          (light)
      __layer--body   the sign itself, switched off                        (always)
      __layer--light  the lit edge of the trays and every LED              (light)
+     __layer--knobs  the two knob indicators; scrolling does not fade these (light)
      __bloom         a soft overall glow                                  (light)
    Default styles are the finished, lit state. Only the classes the script adds
    (is-live, is-intro, is-on, is-pinned) hide, animate or pin anything. */
+
+/* Scroll progress, written by js/hero.js on the sign and on each light element.
+   Registered as non-inheriting so a change does not restyle the artwork beneath. */
+@property --s-hero-p {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
 
 .s-hero {
   /* when every LED is on: the stagger across all of them, plus a beat */
@@ -80,6 +89,17 @@
   opacity: calc(1 - var(--s-hero-p));
 }
 
+/* --s-hero-p changes on every scroll frame and custom properties inherit: stop it at
+   the artwork, or thousands of SVG elements restyle and the boards repaint each frame.
+   Only the sign and the four light elements read it. */
+.s-hero .s-hero__layer--base,
+.s-hero .s-hero__layer--body,
+.s-hero .s-hero__layer--knobs,
+.s-hero .s-hero__layer--spill > *,
+.s-hero .s-hero__layer--light > * {
+  --s-hero-p: 0;
+}
+
 /* the pool of light the sign throws on the wall: the slate lifts towards --bg-lift
    behind the letters and fades out long past them */
 .s-hero .s-hero__wall {
@@ -88,8 +108,11 @@
   background:
     linear-gradient(to bottom, rgba(204, 211, 215, 0.13) 22%, rgba(204, 211, 215, 0) 58%),
     linear-gradient(to bottom, rgba(78, 92, 99, 1) 50%, rgba(78, 92, 99, 0.6) 80%);
-  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 40%, rgba(0, 0, 0, 0.45) 68%, transparent 100%);
-  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 40%, rgba(0, 0, 0, 0.45) 68%, transparent 100%);
+  /* fades out at the edges, and upwards before it reaches the header's lower edge */
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 40%, rgba(0, 0, 0, 0.45) 68%, transparent 100%), linear-gradient(to bottom, transparent 19.5%, #000 46%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 40%, rgba(0, 0, 0, 0.45) 68%, transparent 100%), linear-gradient(to bottom, transparent 19.5%, #000 46%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
 }
 
 .s-hero .s-hero__bloom {
@@ -116,8 +139,18 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.s-hero .s-hero__knob:hover {
-  background: radial-gradient(closest-side, rgba(255, 179, 71, 0.22), rgba(255, 90, 31, 0));
+/* a finger needs more room than the knob's drawn size */
+@media (pointer: coarse) {
+  .s-hero .s-hero__knob {
+    width: max(6.2%, 2.75rem);
+  }
+}
+
+/* only where a pointer can hover: on touch screens :hover sticks after a tap */
+@media (hover: hover) {
+  .s-hero .s-hero__knob:hover {
+    background: radial-gradient(closest-side, rgba(255, 179, 71, 0.22), rgba(255, 90, 31, 0));
+  }
 }
 
 .s-hero .s-hero__knob:active {
@@ -314,9 +347,11 @@
   100% { opacity: 1; }
 }
 
+/* these end at the scroll-driven value, not a fixed 1, so scrolling during a
+   power-up cannot leave the wall lit around a dimmed sign */
 @keyframes s-hero-spill {
   from { opacity: 0; }
-  to { opacity: 1; }
+  to { opacity: calc(1 - var(--s-hero-p)); }
 }
 
 @keyframes s-hero-standby {
@@ -326,7 +361,7 @@
 
 @keyframes s-hero-bloom {
   from { opacity: 0; transform: scale(0.7); }
-  to { opacity: 1; transform: scale(1); }
+  to { opacity: calc(1 - var(--s-hero-p)); transform: scale(1); }
 }
 
 @keyframes s-hero-rise {
@@ -350,7 +385,7 @@
   .s-hero.is-intro .s-hero__bloom,
   .s-hero.is-intro .s-hero__rise {
     opacity: 1;
-    animation: none;
+    animation: none !important;
   }
 
   .s-hero.is-powering .led,
@@ -365,10 +400,10 @@
     transform: none;
   }
 
-  .s-hero.is-live .s-hero__wall,
-  .s-hero.is-live .s-hero__layer--spill,
+  .s-hero.is-live:not(.is-off) .s-hero__wall,
+  .s-hero.is-live:not(.is-off) .s-hero__layer--spill,
   .s-hero.is-live .s-hero__layer--light,
-  .s-hero.is-live .s-hero__bloom {
+  .s-hero.is-live:not(.is-off) .s-hero__bloom {
     opacity: 1;
   }
 }
