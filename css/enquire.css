@@ -100,6 +100,7 @@
 /* ---------- Panel and fields ---------- */
 
 .s-enquire .s-enquire__panel {
+  scroll-margin-top: calc(var(--sticky-h) + 1.5rem);
   background: var(--surface);
   border-radius: var(--radius);
   padding: clamp(1.5rem, 4vw, 3rem);
@@ -128,7 +129,7 @@
   width: 100%;
   min-height: 3rem;
   padding: 0.75rem 0.9rem;
-  border: 1px solid var(--line);
+  border: 1px solid #7a8991;          /* lighter than --line: field edges need 3:1 against the panel */
   border-radius: var(--radius);
   background-color: var(--deep);
   color: var(--text);
@@ -168,7 +169,8 @@
   border-color: var(--warm);
 }
 
-.s-enquire [aria-invalid="true"] {
+.s-enquire input[aria-invalid="true"],
+.s-enquire textarea[aria-invalid="true"] {
   border-color: var(--accent);
   box-shadow: inset 3px 0 0 var(--accent);
 }
@@ -183,6 +185,12 @@
 
 .s-enquire .s-enquire__hint {
   color: var(--text-soft);
+}
+
+/* once a field has an error, the error replaces its hint */
+.s-enquire input[aria-invalid="true"] + .s-enquire__hint,
+.s-enquire textarea[aria-invalid="true"] + .s-enquire__hint {
+  display: none;
 }
 
 .s-enquire .s-enquire__error {
@@ -230,6 +238,7 @@
 }
 
 .s-enquire .s-enquire__led {
+  display: block;
   flex: none;
   width: 0.65rem;
   height: 0.65rem;
@@ -288,6 +297,26 @@
   font-size: 1.125rem;
 }
 
-.s-enquire .s-enquire__sent-email {
-  overflow-wrap: anywhere;
+.s-enquire .s-enquire__sent p {
+  overflow-wrap: anywhere;          /* a long name or address must not push the page sideways */
+}
+
+.s-enquire .s-enquire__sent p:last-child a {
+  display: inline-block;
+  padding-block: 0.75rem;
+}
+
+/* high-contrast modes: use the system's own dropdown arrow and mark invalid fields by weight */
+@media (forced-colors: active) {
+  .s-enquire select {
+    -webkit-appearance: auto;
+    appearance: auto;
+    background-image: none;
+    padding-right: 0.9rem;
+  }
+
+  .s-enquire input[aria-invalid="true"],
+  .s-enquire textarea[aria-invalid="true"] {
+    border-width: 3px;
+  }
 }

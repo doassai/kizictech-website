@@ -50,6 +50,10 @@ html {
 }
 
 body {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;                      /* short pages keep the footer at the bottom of the window */
+  flex-direction: column;
   margin: 0;
   background: var(--bg);
   color: var(--text);
@@ -58,6 +62,10 @@ body {
   line-height: 1.6;
   font-stretch: 100%;
   -webkit-font-smoothing: antialiased;
+}
+
+main {
+  flex: 1 0 auto;
 }
 
 img,

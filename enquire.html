@@ -78,7 +78,7 @@
 
           <div class="s-enquire__field">
             <label for="enq-email">Email address</label>
-            <input id="enq-email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="200" aria-describedby="enq-email-hint enq-email-error">
+            <input id="enq-email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="200" pattern="[^@\s]+@[^@\s]+\.[^@\s.]{2,}" title="An email address with a full domain, such as .com or .com.au" aria-describedby="enq-email-hint enq-email-error">
             <p class="s-enquire__hint" id="enq-email-hint">We reply to this address.</p>
             <p class="s-enquire__error" id="enq-email-error" hidden></p>
           </div>
@@ -101,11 +101,12 @@
 
           <div class="s-enquire__field">
             <label for="enq-message">Your enquiry</label>
-            <textarea id="enq-message" name="message" rows="6" required maxlength="5000" aria-describedby="enq-message-error"></textarea>
+            <textarea id="enq-message" name="message" rows="6" required maxlength="5000" aria-describedby="enq-message-hint enq-message-error"></textarea>
+            <p class="s-enquire__hint" id="enq-message-hint">Up to 5,000 characters.</p>
             <p class="s-enquire__error" id="enq-message-error" hidden></p>
           </div>
 
-          <p class="s-enquire__privacy">We use these details only to reply to you. The <a href="privacy.html">privacy policy</a> explains how.</p>
+          <p class="s-enquire__privacy">We use these details only to deal with your enquiry and reply to you. The <a href="privacy.html">privacy policy</a> explains how.</p>
 
           <div class="s-enquire__actions">
             <button class="button button-primary s-enquire__send" type="submit">Send enquiry</button>
